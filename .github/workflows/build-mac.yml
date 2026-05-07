@@ -24,11 +24,11 @@ jobs:
 
       - name: Test run
         run: |
-          python main.py --help || true
+          python app.py --help || true
 
       - name: Build macOS app
         run: |
-          pyinstaller --windowed --onedir --name MyPythonApp main.py
+          pyinstaller --windowed --onedir --name MyPythonApp app.py
 
       - name: Create dmg
         run: |
