@@ -1,0 +1,43 @@
+name: Build macOS App
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Test run
+        run: |
+          python main.py --help || true
+
+      - name: Build macOS app
+        run: |
+          pyinstaller --windowed --onedir --name MyPythonApp main.py
+
+      - name: Create dmg
+        run: |
+          hdiutil create -volname "MyPythonApp" -srcfolder "dist/MyPythonApp.app" -ov -format UDZO "MyPythonApp.dmg"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MyPythonApp-mac
+          path: |
+            dist/MyPythonApp.app
+            MyPythonApp.dmg
